@@ -1,8 +1,9 @@
 # ComfyUI-FlashAttention4
 
 MODEL patch that routes dense attention through **FlashAttention 4** (CuTe DSL)
-on NVIDIA Blackwell / RTX 50 (SM120/SM121). The SM120 kernel bundle is loaded
-through `kernels`; no kernel source is rebuilt here.
+on NVIDIA GPUs from Ampere onward (SM80 / SM89 / SM90 / SM100 / SM110 /
+SM120). The SM120/SM121 kernel bundle is loaded through `kernels`; no kernel
+source is rebuilt here.
 
 - Node: `FlashAttention4 Model Patch` (`FlashAttention4ModelPatch`, MODEL → MODEL)
 - Stats: `FlashAttention4 Stats` (`FlashAttention4Stats`, 7 INT outputs)
@@ -67,12 +68,23 @@ Each case increments a STATS counter, so silent degradation is visible.
 
 ## Supported platforms
 
+FA4 (CuTe DSL) supports **SM80 / SM89 / SM90 / SM100 / SM110 / SM120** — the
+upstream README says "optimized for Hopper and Blackwell", and this bundle's
+`interface.py` asserts `arch // 10 in [8, 9, 10, 11, 12]`. The bundle name
+`flash-attn-4-sm120` refers to the *targeted PRs* it carries, not a hard limit.
+
 | Platform | Status |
 |---|---|
-| Windows x86 + SM120/SM121 | Tested (RTX 5070, torch 2.13+cu130, Python 3.12) |
-| Linux x86 + SM80/SM90/SM100/SM120 | Expected to work via the same `kernels` bundle; not CI-tested |
+| Windows x86 + SM120/SM121 (RTX 50) | **Tested**: RTX 5070, torch 2.13+cu130, Python 3.12 |
+| Linux/Windows x86 + SM80/SM89 (Ampere/Ada) | Expected to work (SM80 kernel present); not tested here |
+| Linux/Windows x86 + SM90 (Hopper) | Expected to work (SM90 kernel present); not tested here |
+| Linux/Windows x86 + SM100/SM110 (Blackwell DC) | Expected to work (SM100 kernel present); not tested here |
 | CPU-only / no GPU | Imports and runs; attention falls back to SDPA |
 | AMD ROCm / Apple MPS / Windows-ARM | FA4 has no kernel; attention falls back to SDPA |
+
+This node pack adds **no** arch check of its own: it calls `flash_attn_func`
+and lets the bundle dispatch. If the bundle has no kernel for your card, the
+call raises and the adapter falls back to SDPA (counted in `kernel_errors`).
 
 FA4 is a **dense** kernel. On workloads where a quantized (Kitchen INT8, Sage)
 or sparse (Spark) backend is faster, FA4 can be slower. Benchmark before

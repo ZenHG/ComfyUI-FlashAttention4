@@ -8,12 +8,12 @@
 [project]
 name = "comfyui-flash-attention4"
 version = "0.2.2"
-description = "ComfyUI MODEL patch that routes dense attention through FlashAttention 4 (CuTe DSL), using Dao-AILab FA4 or the SecondNatureComputing SM120/SM121 kernel bundle via kernels."
+description = "ComfyUI MODEL patch that routes dense attention through FlashAttention 4 (CuTe DSL) on NVIDIA SM80+ (Ampere/Ada/Hopper/Blackwell), using Dao-AILab FA4 or the SecondNatureComputing kernel bundle via kernels."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
 authors = [{ name = "ComfyUI-FlashAttention4 contributors" }]
-keywords = ["comfyui", "flash-attention", "flash-attention-4", "fa4", "attention", "model-patch", "sm120", "blackwell", "rtx-50", "minimax-h3"]
+keywords = ["comfyui", "flash-attention", "flash-attention-4", "fa4", "attention", "model-patch", "sm80", "sm89", "sm90", "sm100", "sm120", "blackwell", "hopper", "ampere", "rtx-50", "minimax-h3"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
