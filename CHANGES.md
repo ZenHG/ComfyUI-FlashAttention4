@@ -2,6 +2,13 @@
 
 > 开发者向的历史记录。用户可见的升级说明写在 [`RELEASE-NOTES.md`](RELEASE-NOTES.md)。
 
+## 0.2.4 — 2026-11-24
+- ✨ `FlashAttention4Stats` 多返回一个 `fa4_source`（`upstream` / `kernels` / `none`），
+  A/B 时能直接看出走的是哪条加载路径。
+- ✨ 新增环境变量 `FLASH_ATTENTION4_SOURCE=auto|upstream|kernels` 强制选路（默认 auto：先 upstream 再 kernels）。
+- 🐛 `reset_stats()` 现在把 `fa4_source` 归零为 `"none"`（此前会被置成整数 0）。
+- 📚 README 补 PyPI `flash-attn-4` 安装路（上游 4.0.0b40 已自带 SM120 kernel）。
+
 ## 0.2.3 — 2026-11-24
 - 📦 registry 包名定为 `comfyui-fa4`（`comfyui-flash-attention4` 已被占）。
 - 📐 平台声明按 bundle 源码写全：SM80/89/90/100/110/120（本机只实测 SM120）。

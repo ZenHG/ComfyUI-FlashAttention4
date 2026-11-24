@@ -13,6 +13,28 @@
 
 ---
 
+## 0.2.4 — 2026-11-24
+
+**能看出 FA4 是从哪条路加载的；PyPI 装法写进 README。**
+
+- `FlashAttention4 Stats` 多一个 `fa4_source` 输出：`upstream` / `kernels` / `none`。
+- 新增 `FLASH_ATTENTION4_SOURCE=auto|upstream|kernels` 环境变量，可强制选路。
+- README 增加 PyPI `flash-attn-4` 安装路（上游 4.0.0b40 已自带 SM120 kernel）。
+- 🔴 行为没变；老工作流不用改。
+
+**升级动作**：无。覆盖安装即可。
+
+<!-- EN -->
+
+**You can now see which route loaded FA4; the PyPI install path is documented.**
+
+- `FlashAttention4 Stats` gains a `fa4_source` output: `upstream` / `kernels` / `none`.
+- New `FLASH_ATTENTION4_SOURCE=auto|upstream|kernels` env var to force a route.
+- README adds the PyPI `flash-attn-4` install route (4.0.0b40 ships SM120 kernels).
+- 🔴 No behaviour change; existing workflows keep working.
+
+**Action required**: None. Overwrite to upgrade.
+
 ## 0.2.3 — 2026-11-24
 
 **Registry 包名定为 `comfyui-fa4`；FA4 的支持范围写全为 SM80 及以上。**

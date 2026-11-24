@@ -15,7 +15,7 @@ No kernel source is compiled here — the SM120/Blackwell kernel bundle is downl
 
 | Item | Value |
 |---|---|
-| Version | **0.2.3** |
+| Version | **0.2.4** |
 | License | **MIT** ([`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md); the kernel bundle is BSD-3-Clause) |
 | Host | **ComfyUI ≥ 0.38.0** |
 | GPU | NVIDIA **SM80+** (Ampere / Ada / Hopper / Blackwell). Tested on **SM120** (RTX 5070) only |
@@ -110,8 +110,13 @@ Read the counters:
 (`[FlashAttention4] stats {...}`), because a reset node runs *before* the sampler and would
 otherwise only ever report zeros.
 
+`FlashAttention4 Stats` also returns `fa4_source` — `upstream` (PyPI `flash_attn.cute`),
+`kernels` (the SecondNatureComputing bundle), or `none` (nothing loaded yet).
 `FlashAttention4 Stats Line` formats the same counters as one line and appends
 `FA4 ACTIVE` or `NOT A CLEAN FA4 RUN`.
+
+To force one route, set `FLASH_ATTENTION4_SOURCE=upstream` or `=kernels` before
+starting ComfyUI. Default `auto` tries upstream first, then the kernels bundle.
 
 ### 1.5 Uninstall
 

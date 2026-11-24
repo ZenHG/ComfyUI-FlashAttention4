@@ -48,6 +48,8 @@ STATS = {
     "sdpa_headdim": 0,
     "sdpa_meta": 0,
     "kernel_error": 0,
+    # "none" | "upstream" (flash_attn.cute) | "kernels" (SecondNatureComputing bundle)
+    "fa4_source": "none",
 }
 
 _flash_attn_4_func = None
@@ -57,7 +59,7 @@ _load_error: Exception | None = None
 def reset_stats():
     """Zero the fallback counters (call before a timed A/B run)."""
     for key in STATS:
-        STATS[key] = 0
+        STATS[key] = "none" if key == "fa4_source" else 0
 
 
 def stats_snapshot():
@@ -140,8 +142,16 @@ def _load_flash_attn_4():
 
     _prepare_kernel_import()
 
+    forced = os.environ.get("FLASH_ATTENTION4_SOURCE", "auto").strip().lower()
+    if forced in ("upstream", "kernels"):
+        log.info("[FlashAttention4] FLASH_ATTENTION4_SOURCE=%s (forced)", forced)
+
     try:
+        if forced == "kernels":
+            raise ImportError("forced to kernels by FLASH_ATTENTION4_SOURCE")
         from flash_attn.cute import flash_attn_func as fa4_func
+
+        STATS["fa4_source"] = "upstream"
     except Exception as upstream_error:
         log.info(
             "flash_attn.cute is unavailable (%s); trying the SM120 kernel bundle",
@@ -152,6 +162,7 @@ def _load_flash_attn_4():
 
             flash_attn_4 = get_kernel(KERNEL_REPO)
             fa4_func = flash_attn_4.flash_attn_func
+            STATS["fa4_source"] = "kernels"
         except Exception as bundle_error:
             _load_error = bundle_error
             missing = getattr(bundle_error, "name", None)

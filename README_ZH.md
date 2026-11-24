@@ -14,7 +14,7 @@
 
 | 项 | 值 |
 |---|---|
-| 版本 | **0.2.3** |
+| 版本 | **0.2.4** |
 | 许可 | **MIT**（[`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md)；kernel bundle 是 BSD-3-Clause） |
 | 宿主 | **ComfyUI ≥ 0.38.0** |
 | GPU | NVIDIA **SM80+**（Ampere / Ada / Hopper / Blackwell）。**只在 SM120（RTX 5070）实测过** |
@@ -106,8 +106,13 @@ FA4 在不支持的输入上会回退 SDPA，所以「没报错」不等于「FA
 （`[FlashAttention4] stats {...}`）——因为 reset 节点在采样器**之前**执行，
 不延迟打印的话只会看到全 0。
 
+`FlashAttention4 Stats` 还会返回 `fa4_source`——`upstream`（PyPI 的 `flash_attn.cute`）、
+`kernels`（SecondNatureComputing bundle）、或 `none`（还没加载）。
 `FlashAttention4 Stats Line` 把同样的计数器格式化成一行，并追加
 `FA4 ACTIVE` 或 `NOT A CLEAN FA4 RUN`。
+
+要强制走某一路，在启动 ComfyUI 前设
+`FLASH_ATTENTION4_SOURCE=upstream` 或 `=kernels`。默认 `auto`：先 upstream，再 kernels。
 
 ### 1.5 卸载
 

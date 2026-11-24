@@ -87,7 +87,7 @@ class FlashAttention4Stats:
             },
         }
 
-    RETURN_TYPES = ("INT", "INT", "INT", "INT", "INT", "INT", "INT")
+    RETURN_TYPES = ("INT", "INT", "INT", "INT", "INT", "INT", "INT", "STRING")
     RETURN_NAMES = (
         "fa4_calls",
         "sdpa_mask",
@@ -96,6 +96,7 @@ class FlashAttention4Stats:
         "sdpa_headdim",
         "sdpa_meta",
         "kernel_errors",
+        "fa4_source",
     )
     FUNCTION = "read"
     CATEGORY = "model_patches/attention"
@@ -135,6 +136,7 @@ class FlashAttention4Stats:
             int(s.get("sdpa_headdim", 0)),
             int(s.get("sdpa_meta", 0)),
             int(s.get("kernel_error", 0)),
+            str(s.get("fa4_source", "none")),
         )
 
 
@@ -152,6 +154,7 @@ class FlashAttention4StatsLine:
                 "sdpa_headdim": ("INT", {"default": 0}),
                 "sdpa_meta": ("INT", {"default": 0}),
                 "kernel_errors": ("INT", {"default": 0}),
+                "fa4_source": ("STRING", {"default": "none"}),
             },
         }
 
@@ -174,10 +177,11 @@ class FlashAttention4StatsLine:
         sdpa_headdim,
         sdpa_meta,
         kernel_errors,
+        fa4_source="none",
     ):
         line = (
             "fa4={} sdpa_mask={} sdpa_dtype={} sdpa_gqa={} sdpa_headdim={} "
-            "sdpa_meta={} kernel_errors={}".format(
+            "sdpa_meta={} kernel_errors={} source={}".format(
                 int(fa4_calls),
                 int(sdpa_mask),
                 int(sdpa_dtype),
@@ -185,6 +189,7 @@ class FlashAttention4StatsLine:
                 int(sdpa_headdim),
                 int(sdpa_meta),
                 int(kernel_errors),
+                fa4_source,
             )
         )
         ok = int(fa4_calls) > 0 and not any(

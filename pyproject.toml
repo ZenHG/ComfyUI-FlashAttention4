@@ -7,7 +7,7 @@
 # them after urls would silently make them part of the urls table.
 [project]
 name = "comfyui-fa4"
-version = "0.2.3"
+version = "0.2.4"
 description = "ComfyUI MODEL patch that routes dense attention through FlashAttention 4 (CuTe DSL) on NVIDIA SM80+ (Ampere/Ada/Hopper/Blackwell), using Dao-AILab FA4 or the SecondNatureComputing kernel bundle via kernels."
 readme = "README.md"
 requires-python = ">=3.10"

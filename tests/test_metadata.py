@@ -37,7 +37,7 @@ def main():
 
     print("== 1. pyproject ==")
     check("name = comfyui-fa4", project["name"] == "comfyui-fa4", project["name"])
-    check("version = 0.2.3", project["version"] == "0.2.3", project["version"])
+    check("version = 0.2.4", project["version"] == "0.2.4", project["version"])
     check("license 指向 LICENSE 文件", project["license"].get("file") == "LICENSE", str(project["license"]))
     check("requires-python >= 3.10", project["requires-python"] == ">=3.10", project["requires-python"])
     check("comfy PublisherId 存在", bool(comfy.get("PublisherId")))

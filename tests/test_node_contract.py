@@ -45,7 +45,7 @@ def main():
     fa4 = sys.modules[pkg.__name__ + ".attention_fa4"]
 
     print("== 1. Package exports ==")
-    check("__version__ = 0.2.3", pkg.__version__ == "0.2.3", pkg.__version__)
+    check("__version__ = 0.2.4", pkg.__version__ == "0.2.4", pkg.__version__)
     check("NODE_CLASS_MAPPINGS 存在", bool(nodes.NODE_CLASS_MAPPINGS))
     check("NODE_DISPLAY_NAME_MAPPINGS 存在", bool(nodes.NODE_DISPLAY_NAME_MAPPINGS))
     check(
@@ -86,11 +86,12 @@ def main():
 
     print("== 5. Stats node contract ==")
     stats_cls = nodes.NODE_CLASS_MAPPINGS["FlashAttention4Stats"]
-    check("Stats RETURN_TYPES 是 7 个 INT", stats_cls.RETURN_TYPES == ("INT",) * 7, str(stats_cls.RETURN_TYPES))
+    check("Stats RETURN_TYPES 是 7 INT + 1 STRING", stats_cls.RETURN_TYPES == ("INT",) * 7 + ("STRING",), str(stats_cls.RETURN_TYPES))
     check("Stats 有 reset", "reset" in stats_cls.INPUT_TYPES()["required"])
     fa4.reset_stats()
     s = stats_cls().read(True)
     check("reset=True 归零后 fa4_calls=0", s[0] == 0, str(s))
+    check("fa4_source 默认 none", s[7] == "none", str(s[7]))
     # simulate a dtype fallback via CPU fp32
     import torch
 
