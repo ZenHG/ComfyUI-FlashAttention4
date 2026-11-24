@@ -15,9 +15,9 @@ import sys
 import cv2
 import numpy as np
 
-OUT = r"I:\ComfyUI\output"
-SHEET = r"H:\ComfyUI-H3-Latent-Relay\LOCAL_ab_contact_sheet.png"
-JSON_OUT = r"H:\ComfyUI-H3-Latent-Relay\LOCAL_ab_quality_20261124.json"
+OUT = os.environ.get("COMFYUI_OUTPUT", r"I:\ComfyUI\output")
+SHEET = os.environ.get("AB_SHEET", os.path.join(OUT, "ab_contact_sheet.png"))
+JSON_OUT = os.environ.get("AB_JSON_OUT", os.path.join(OUT, "ab_quality.json"))
 
 VIDS = {
     "3step": "abT3_C2_4step_00001_.mp4",

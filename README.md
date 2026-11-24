@@ -8,6 +8,7 @@ through `kernels`; no kernel source is rebuilt here.
 - Stats: `FlashAttention4 Stats` (`FlashAttention4Stats`, 7 INT outputs)
 - Stats line: `FlashAttention4 Stats Line` (`FlashAttention4StatsLine`, STRING, marks clean runs)
 - Registry name: `flash4`
+- Version: **0.2.2**
 
 ## Install
 
