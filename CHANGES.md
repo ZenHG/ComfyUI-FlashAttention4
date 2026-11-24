@@ -3,8 +3,8 @@
 > 开发者向的历史记录。用户可见的升级说明写在 [`RELEASE-NOTES.md`](RELEASE-NOTES.md)。
 
 ## 0.2.2 — 2026-11-24
-- 🧹 开源卫生：README 改为英文、移除内部语境（无「母版 / 152s 档 / H3 结论」），
-  工具提示改为英文；扫描无本机路径、无凭据、无 CJK。
+- 🧹 开源卫生：README 改为英文，移除内部语境（无内部工作流名、无与仓库无关的基线代号、
+  无单项目结论）；工具提示改为英文；扫描无本机路径、无凭据、无 CJK。
 - 📊 README 的 A/B 表改为实测值（Kitchen+Spark 77.4–141.8s / Kitchen only 86.9s /
   FA4 only 141.1–177.9s / FA4+Spark 85.6s）。
 - 🧰 `tests/test_metadata.py` 的 README 断言与重写后的 README 对齐。
