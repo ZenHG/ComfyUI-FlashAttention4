@@ -38,19 +38,28 @@ falls back to SDPA — loudly, with a counter.
 | **Manual** | `cd <ComfyUI>/custom_nodes` → `git clone https://github.com/ZenHG/ComfyUI-FlashAttention4` |
 | **Registry** | <https://registry.comfy.org/nodes/comfyui-fa4> |
 
-If you installed through the Manager, dependencies come with the pack. If you cloned
-manually (or the first run fails with `ModuleNotFoundError`), install the runtime
-dependencies **into the Python that runs ComfyUI**:
+Then install the kernel **into the Python that runs ComfyUI**. Two routes, pick one:
+
+**Route A — PyPI (simplest).** Upstream `flash-attn-4` (4.0.0b40, 2026-11-18) already
+ships SM120 kernels (`flash_fwd_sm120.py` / `flash_bwd_sm120.py`), so one package is enough:
+
+```bash
+<Python> -m pip install "flash-attn-4>=4.0.0b40"
+```
+
+**Route B — `kernels` bundle.** If PyPI's build does not load on your setup, use the
+community SM120 bundle instead (this is what the `kernels` path in `attention_fa4.py` does):
 
 ```bash
 <Python> -m pip install "kernels>=0.9,<0.14" "huggingface-hub==0.36.2" \
-    cuda-python "nvidia-cutlass-dsl[cu13]==4.8.1" quack-kernels "apache-tvm-ffi>=0.1.6,<0.2"
+    cuda-python "nvidia-cutlass-dsl[cu13]>=4.6.2" quack-kernels "apache-tvm-ffi>=0.1.11,<0.2"
 ```
 
-Restart ComfyUI.
+Restart ComfyUI. The adapter tries `flash_attn.cute` first (Route A) and falls back to
+`kernels.get_kernel(...)` (Route B) automatically — no config needed.
 
-🔴 **Do not `pip install -U kernels` to 0.14+.** It pulls `huggingface-hub` 2.x and
-breaks ComfyUI's `diffusers` / `transformers`. Pin `0.12.0` + `hub 0.36.2`.
+🔴 **Route B only:** do not `pip install -U kernels` to 0.14+. It pulls `huggingface-hub`
+2.x and breaks ComfyUI's `diffusers` / `transformers`. Pin `0.12.0` + `hub 0.36.2`.
 
 🔴 **Install into the right Python.** If ComfyUI runs on a specific interpreter (see
 `ComfyUI Path` in the startup log), installing into another one does nothing — the node

@@ -36,17 +36,27 @@
 | **手动** | `cd <ComfyUI>/custom_nodes` → `git clone https://github.com/ZenHG/ComfyUI-FlashAttention4` |
 | **Registry** | <https://registry.comfy.org/nodes/comfyui-fa4> |
 
-Manager 装的包自带依赖；手动 clone（或首次运行报 `ModuleNotFoundError`）时，
-把运行依赖装到**跑 ComfyUI 的那个 Python**：
+然后把 kernel 装到**跑 ComfyUI 的那个 Python**。两条路，选一条：
+
+**路 A —— PyPI（最简单）。** 上游 `flash-attn-4`（4.0.0b40，2026-11-18）已经自带
+SM120 kernel（`flash_fwd_sm120.py` / `flash_bwd_sm120.py`），一个包就够：
+
+```bash
+<Python> -m pip install "flash-attn-4>=4.0.0b40"
+```
+
+**路 B —— `kernels` bundle。** 如果 PyPI 的包在你的环境里加载不了，用社区的 SM120 bundle
+（`attention_fa4.py` 里的 `kernels` 分支就是这条）：
 
 ```bash
 <Python> -m pip install "kernels>=0.9,<0.14" "huggingface-hub==0.36.2" \
-    cuda-python "nvidia-cutlass-dsl[cu13]==4.8.1" quack-kernels "apache-tvm-ffi>=0.1.6,<0.2"
+    cuda-python "nvidia-cutlass-dsl[cu13]>=4.6.2" quack-kernels "apache-tvm-ffi>=0.1.11,<0.2"
 ```
 
-然后重启 ComfyUI。
+然后重启 ComfyUI。适配器**先试 `flash_attn.cute`（路 A）**，失败再回退
+`kernels.get_kernel(...)`（路 B）——不用改配置。
 
-🔴 **不要 `pip install -U kernels` 到 0.14+**：它会拉 `huggingface-hub` 2.x，
+🔴 **仅路 B**：不要 `pip install -U kernels` 到 0.14+。它会拉 `huggingface-hub` 2.x，
 搞坏 ComfyUI 的 `diffusers` / `transformers`。钉 `0.12.0` + `hub 0.36.2`。
 
 🔴 **装对 Python**。ComfyUI 跑在哪个解释器（启动日志里的 `ComfyUI Path`），
