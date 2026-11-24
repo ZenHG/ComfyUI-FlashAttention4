@@ -37,7 +37,7 @@ def main():
 
     print("== 1. pyproject ==")
     check("name = comfyui-flash-attention4", project["name"] == "comfyui-flash-attention4", project["name"])
-    check("version = 0.2.0", project["version"] == "0.2.0", project["version"])
+    check("version = 0.2.1", project["version"] == "0.2.1", project["version"])
     check("license 指向 LICENSE 文件", project["license"].get("file") == "LICENSE", str(project["license"]))
     check("requires-python >= 3.10", project["requires-python"] == ">=3.10", project["requires-python"])
     check("comfy PublisherId 存在", bool(comfy.get("PublisherId")))
@@ -62,6 +62,8 @@ def main():
         "SecondNatureComputing/flash-attn-4-sm120",
         "flash4",
         "MODEL → MODEL",
+        "FlashAttention4Stats",
+        "Spark-H3",
     ):
         check("README 含 %s" % needle, needle in readme)
 

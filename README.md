@@ -35,10 +35,20 @@ Insert `FlashAttention4 Model Patch` in the MODEL chain, after the loader / LoRA
 sparse-attention pack and before the sampler. It clones the model and installs
 the FA4 adapter as the optimized attention override.
 
-For A/B runs, add `FlashAttention4 Stats` with `reset=True` before the run,
-then read the outputs. A valid FA4 run has `fa4 > 0` and all `sdpa_*` /
-`kernel_errors` = 0. If `kernel_errors` increments, the log line
-`FlashAttention 4 failed, using SDPA` names the cause.
+### Proving FA4 actually ran
+
+FA4 is optional: on any unsupported input it falls back to SDPA. Add
+`FlashAttention4 Stats` with `reset=True` before the run, then read the
+outputs. A valid FA4 run has:
+
+- `fa4_calls > 0`
+- all `sdpa_mask` / `sdpa_dtype` / `sdpa_gqa` / `sdpa_headdim` / `sdpa_meta` = 0
+- `kernel_errors` = 0
+
+The stats node also prints to the host stdout every 30 s
+(`[FlashAttention4] live stats {...}`), because a reset node runs *before* the
+sampler and would otherwise only ever report zeros. If `kernel_errors`
+increments, the log line `FlashAttention 4 failed, using SDPA` names the cause.
 
 ## What falls back to SDPA
 
@@ -58,20 +68,52 @@ Each case increments a STATS counter, so silent degradation is visible.
 | CPU-only / no GPU | Imports and runs; attention falls back to SDPA |
 | AMD ROCm / Apple MPS / Windows-ARM | FA4 has no kernel; attention falls back to SDPA |
 
+FA4 is a **dense** kernel. On workloads where a quantized (Kitchen INT8, Sage)
+or sparse (Spark) backend is faster, FA4 can be slower. Benchmark before
+swapping a production chain.
+
+## Interaction with sparse-attention packs
+
+If a sparse pack (e.g. Spark-H3) is in the chain, it installs its own
+per-block attention patch and **FA4 will not see those calls**. In our tests
+Spark kept reporting `comfy_kitchen_calls` with FA4 installed, and the FA4
+counter stayed at 0. Set the sparse pack's `dense_backend` explicitly if you
+want FA4 to serve its dense path — `inherit` does **not** mean FA4.
+
 ## Benchmarks
 
-Workload: 640×832, 124 frames, 10 steps, `er_sde`, LoRA×2, RTX 5070.
-Times are ComfyUI `Prompt executed` seconds.
+Workload: 640×832, 124 frames, 6 steps, `er_sde`, LoRA×2, RTX 5070.
+Times are ComfyUI `Prompt executed` seconds; cold = first run after a restart.
 
-| Backend | Time | Note |
-|---|---:|---|
-| Kitchen INT8 + Spark | 77.4–141.8s | sparse + quantized dense |
-| Kitchen INT8 only | 86.9s | quantized dense |
-| FA4 only | 141.1–177.9s | dense FA4, cold JIT included |
-| FA4 + Spark | 85.6s | Spark still routes dense through Kitchen |
+| Backend | Cold | Hot | Note |
+|---|---:|---:|---|
+| Kitchen INT8 + Spark | 121.7s | 67.1s | sparse + quantized dense |
+| Kitchen INT8 only | 71.7s | 67.9s | quantized dense |
+| FA4 only | 126.5s | **116.1s** | dense FA4, 1.7× slower than Kitchen |
+| FA4 + Spark | 68.4s | 65.8s | FA4 unused (Spark routes dense to Kitchen) |
 
-FA4 is a dense kernel: on workloads where a quantized or sparse backend is
-faster, FA4 can be slower. Benchmark before swapping a production chain.
+### Step count matters more than the backend
+
+Same graph (Kitchen, LoRA×2, no Spark), only the sigma table changed:
+
+| Steps | Time |
+|---:|---:|
+| 3 | **39.9s** |
+| 6 | 67.9s |
+| 8 | 94.5s |
+
+≈ 11 s/step including a fixed ~10 s for VAE decode + save.
+
+### Quality snapshot (same 640×832×124, seed 12345)
+
+| Run | Body sharpness | High-freq ratio | Temporal SSIM | Seam/body |
+|---|---:|---:|---:|---:|
+| 3 steps | 31.5 | 0.9719 | 0.9946 | 0.893 |
+| 6 steps | 39.7 | 0.9821 | 0.9784 | 0.715 |
+| FA4 6 steps | 41.7 | 0.9818 | 0.9765 | 0.712 |
+
+3 steps is ~21% softer than 6 steps but has the steadiest frames; 8 steps adds
+no measurable detail over 6.
 
 ## License
 

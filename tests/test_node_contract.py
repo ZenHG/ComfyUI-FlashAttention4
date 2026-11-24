@@ -45,7 +45,7 @@ def main():
     fa4 = sys.modules[pkg.__name__ + ".attention_fa4"]
 
     print("== 1. Package exports ==")
-    check("__version__ = 0.2.0", pkg.__version__ == "0.2.0", pkg.__version__)
+    check("__version__ = 0.2.1", pkg.__version__ == "0.2.1", pkg.__version__)
     check("NODE_CLASS_MAPPINGS 存在", bool(nodes.NODE_CLASS_MAPPINGS))
     check("NODE_DISPLAY_NAME_MAPPINGS 存在", bool(nodes.NODE_DISPLAY_NAME_MAPPINGS))
     check(
