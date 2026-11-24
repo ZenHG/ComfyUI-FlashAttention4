@@ -64,6 +64,8 @@ def main():
         "MODEL → MODEL",
         "FlashAttention4Stats",
         "Spark-H3",
+        "## 3 · Troubleshooting",
+        "## 4 · Supported platforms",
     ):
         check("README 含 %s" % needle, needle in readme)
 
