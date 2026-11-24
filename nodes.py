@@ -138,14 +138,74 @@ class FlashAttention4Stats:
         )
 
 
+class FlashAttention4StatsLine:
+    """One-line text form of the counters, for A/B logs and Preview-style nodes."""
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "fa4_calls": ("INT", {"default": 0}),
+                "sdpa_mask": ("INT", {"default": 0}),
+                "sdpa_dtype": ("INT", {"default": 0}),
+                "sdpa_gqa": ("INT", {"default": 0}),
+                "sdpa_headdim": ("INT", {"default": 0}),
+                "sdpa_meta": ("INT", {"default": 0}),
+                "kernel_errors": ("INT", {"default": 0}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("line",)
+    FUNCTION = "format"
+    OUTPUT_NODE = True
+    CATEGORY = "model_patches/attention"
+    DESCRIPTION = (
+        "Format the FA4 counters as one line: `fa4=.. sdpa_mask=.. ... kernel_errors=..`. "
+        "Wire the Stats node's 7 outputs here and the string shows up in the run's UI."
+    )
+
+    def format(
+        self,
+        fa4_calls,
+        sdpa_mask,
+        sdpa_dtype,
+        sdpa_gqa,
+        sdpa_headdim,
+        sdpa_meta,
+        kernel_errors,
+    ):
+        line = (
+            "fa4={} sdpa_mask={} sdpa_dtype={} sdpa_gqa={} sdpa_headdim={} "
+            "sdpa_meta={} kernel_errors={}".format(
+                int(fa4_calls),
+                int(sdpa_mask),
+                int(sdpa_dtype),
+                int(sdpa_gqa),
+                int(sdpa_headdim),
+                int(sdpa_meta),
+                int(kernel_errors),
+            )
+        )
+        ok = int(fa4_calls) > 0 and not any(
+            (sdpa_mask, sdpa_dtype, sdpa_gqa, sdpa_headdim, sdpa_meta, kernel_errors)
+        )
+        line += "  => FA4 ACTIVE" if ok else "  => NOT A CLEAN FA4 RUN"
+        log.info("[FlashAttention4] %s", line)
+        print("[FlashAttention4] %s" % line, flush=True)
+        return {"ui": {"text": (line,)}, "result": (line,)}
+
+
 NODE_CLASS_MAPPINGS = {
     "FlashAttention4ModelPatch": FlashAttention4ModelPatch,
     "FlashAttention4Stats": FlashAttention4Stats,
+    "FlashAttention4StatsLine": FlashAttention4StatsLine,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "FlashAttention4ModelPatch": "FlashAttention4 Model Patch",
     "FlashAttention4Stats": "FlashAttention4 Stats",
+    "FlashAttention4StatsLine": "FlashAttention4 Stats Line",
 }
 
 

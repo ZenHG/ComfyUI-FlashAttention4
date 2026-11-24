@@ -2,6 +2,10 @@
 
 > 开发者向的历史记录。用户可见的升级说明写在 [`RELEASE-NOTES.md`](RELEASE-NOTES.md)。
 
+## 0.2.2 — 2026-11-24
+- ✨ 新增 `FlashAttention4 Stats Line`：把 7 个计数器格式化成一行字符串，并标 `FA4 ACTIVE` / `NOT A CLEAN FA4 RUN`。
+- 🧰 `tests/test_node_contract.py` 增加 Stats Line 用例（3 节点注册 + 行格式 + 脏跑标记）。
+
 ## 0.2.1 — 2026-11-24
 - 📊 README 的 A/B 表换成**同宿主、同 seed、同 sigma 表**的实测值（6 步）：
   Kitchen+Spark 67.1s(热) / Kitchen 67.9s(热) / FA4 116.1s(热) / FA4+Spark 65.8s。

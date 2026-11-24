@@ -6,6 +6,7 @@ through `kernels`; no kernel source is rebuilt here.
 
 - Node: `FlashAttention4 Model Patch` (`FlashAttention4ModelPatch`, MODEL → MODEL)
 - Stats: `FlashAttention4 Stats` (`FlashAttention4Stats`, 7 INT outputs)
+- Stats line: `FlashAttention4 Stats Line` (`FlashAttention4StatsLine`, STRING, marks clean runs)
 - Registry name: `flash4`
 
 ## Install
@@ -49,6 +50,10 @@ The stats node also prints to the host stdout every 30 s
 (`[FlashAttention4] live stats {...}`), because a reset node runs *before* the
 sampler and would otherwise only ever report zeros. If `kernel_errors`
 increments, the log line `FlashAttention 4 failed, using SDPA` names the cause.
+
+`FlashAttention4 Stats Line` turns the seven counters into one readable string
+(`fa4=15 sdpa_mask=0 ... kernel_errors=0  => FA4 ACTIVE`) and marks any run that
+degraded to SDPA with `NOT A CLEAN FA4 RUN`.
 
 ## What falls back to SDPA
 

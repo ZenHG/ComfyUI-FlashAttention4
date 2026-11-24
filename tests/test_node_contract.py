@@ -45,12 +45,13 @@ def main():
     fa4 = sys.modules[pkg.__name__ + ".attention_fa4"]
 
     print("== 1. Package exports ==")
-    check("__version__ = 0.2.1", pkg.__version__ == "0.2.1", pkg.__version__)
+    check("__version__ = 0.2.2", pkg.__version__ == "0.2.2", pkg.__version__)
     check("NODE_CLASS_MAPPINGS 存在", bool(nodes.NODE_CLASS_MAPPINGS))
     check("NODE_DISPLAY_NAME_MAPPINGS 存在", bool(nodes.NODE_DISPLAY_NAME_MAPPINGS))
     check(
         "注册了两个节点",
-        set(nodes.NODE_CLASS_MAPPINGS) == {"FlashAttention4ModelPatch", "FlashAttention4Stats"},
+        set(nodes.NODE_CLASS_MAPPINGS)
+        == {"FlashAttention4ModelPatch", "FlashAttention4Stats", "FlashAttention4StatsLine"},
         str(sorted(nodes.NODE_CLASS_MAPPINGS)),
     )
 
@@ -97,6 +98,15 @@ def main():
     fn(torch.randn(1, 2, 5, 64), torch.randn(1, 2, 5, 64), torch.randn(1, 2, 5, 64), 2, skip_reshape=True)
     s = stats_cls().read(False)
     check("dtype fallback 后 sdpa_dtype>0", s[2] >= 1, str(s))
+
+    print("== 6. Stats line ==")
+    line_cls = nodes.NODE_CLASS_MAPPINGS["FlashAttention4StatsLine"]
+    out = line_cls().format(3, 0, 0, 0, 0, 0, 0)
+    text = out["ui"]["text"][0]
+    check("行首有 fa4=3", "fa4=3" in text, text[:80])
+    check("干净 run 标 FA4 ACTIVE", "FA4 ACTIVE" in text, text[-60:])
+    bad = line_cls().format(0, 1, 0, 0, 0, 0, 0)["ui"]["text"][0]
+    check("有 sdpa 回退时标 NOT CLEAN", "NOT A CLEAN FA4 RUN" in bad, bad[-60:])
 
     return 1 if FAILED else 0
 

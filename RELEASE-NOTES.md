@@ -11,6 +11,10 @@
 
 ---
 
+## 0.2.2 — 2026-11-24
+- ✨ 新增 `FlashAttention4 Stats Line`：把 7 个计数器格式化成一行字符串，并标 `FA4 ACTIVE` / `NOT A CLEAN FA4 RUN`。
+- 🧰 `tests/test_node_contract.py` 增加 Stats Line 用例（3 节点注册 + 行格式 + 脏跑标记）。
+
 ## 0.2.1 — 2026-11-24
 
 **首个公开版本。FA4 的 ComfyUI MODEL patch，零elnstall 依赖，只包壳不重编 kernel。**
