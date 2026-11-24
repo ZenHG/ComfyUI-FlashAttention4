@@ -16,9 +16,11 @@ authors = [{ name = "ComfyUI-FlashAttention4 contributors" }]
 keywords = ["comfyui", "flash-attention", "flash-attention-4", "fa4", "attention", "model-patch", "sm80", "sm89", "sm90", "sm100", "sm120", "blackwell", "hopper", "ampere", "rtx-50", "minimax-h3"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
-    "Topic :: Multimedia :: Video",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
     "Environment :: GPU :: NVIDIA CUDA",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 # `kernels` downloads the SM120 bundle; the CuTe DSL code itself imports the
 # four packages below. Upstream FA4 users need the same CuTe DSL stack.

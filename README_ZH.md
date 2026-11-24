@@ -12,6 +12,10 @@
 > 640×832 / 124 帧 / 6 步的实测里，**Kitchen INT8 更快**（热态 67.9s vs 116.1s）。
 > FA4 接近无损，但**不是「比量化快」**。先在自己的负载上量一量——[数据在下面](#5--基准)。
 
+**什么时候选 FA4**：想要**接近无损的 dense 后端**时——比如模型没有量化 INT8 后端、
+画质优先的渲染、或稀疏包允许你指定 dense 路径。如果你的模型已经有量化后端
+（Kitchen INT8、Sage），那通常更快——先量再换。
+
 | 项 | 值 |
 |---|---|
 | 版本 | **0.2.4** |
@@ -36,28 +40,23 @@
 | **手动** | `cd <ComfyUI>/custom_nodes` → `git clone https://github.com/ZenHG/ComfyUI-FlashAttention4` |
 | **Registry** | <https://registry.comfy.org/nodes/comfyui-fa4> |
 
-然后把 kernel 装到**跑 ComfyUI 的那个 Python**。两条路，选一条：
-
-**路 A —— PyPI（最简单）。** 上游 `flash-attn-4`（4.0.0b40，2026-11-18）已经自带
-SM120 kernel（`flash_fwd_sm120.py` / `flash_bwd_sm120.py`），一个包就够：
+Manager 会自动装 `requirements.txt`。手动安装只需一条命令，
+**装到跑 ComfyUI 的那个 Python**：
 
 ```bash
-<Python> -m pip install "flash-attn-4>=4.0.0b40"
+<Python> -m pip install -r requirements.txt
 ```
 
-**路 B —— `kernels` bundle。** 如果 PyPI 的包在你的环境里加载不了，用社区的 SM120 bundle
-（`attention_fa4.py` 里的 `kernels` 分支就是这条）：
+`requirements.txt` 里是 CuTe DSL 运行栈（`kernels`、`cuda-python`、
+`nvidia-cutlass-dsl[cu13]`、`quack-kernels`、`apache-tvm-ffi`）。然后适配器：
 
-```bash
-<Python> -m pip install "kernels>=0.9,<0.14" "huggingface-hub==0.36.2" \
-    cuda-python "nvidia-cutlass-dsl[cu13]>=4.6.2" quack-kernels "apache-tvm-ffi>=0.1.11,<0.2"
-```
+1. 先试 `flash_attn.cute`（上游 `flash-attn-4`，4.0.0b40 起自带 SM120）；
+2. 失败回退 `kernels.get_kernel("SecondNatureComputing/flash-attn-4-sm120")`。
 
-然后重启 ComfyUI。适配器**先试 `flash_attn.cute`（路 A）**，失败再回退
-`kernels.get_kernel(...)`（路 B）——不用改配置。
+不用改配置。要强制走某一路，设 `FLASH_ATTENTION4_SOURCE=upstream` 或 `=kernels`。
 
-🔴 **仅路 B**：不要 `pip install -U kernels` 到 0.14+。它会拉 `huggingface-hub` 2.x，
-搞坏 ComfyUI 的 `diffusers` / `transformers`。钉 `0.12.0` + `hub 0.36.2`。
+🔴 **不要 `pip install -U kernels` 到 0.14+**。它会拉 `huggingface-hub` 2.x，
+搞坏 ComfyUI 的 `diffusers` / `transformers`。`requirements.txt` 已钉 `>=0.9,<0.14`。
 
 🔴 **装对 Python**。ComfyUI 跑在哪个解释器（启动日志里的 `ComfyUI Path`），
 就装到那个；装错了节点能加载，但第一次 attention 调用会失败。

@@ -1,8 +1,13 @@
-# 本包**零 pip 依赖**：`torch` 与 `comfy*` 全部由宿主 ComfyUI 提供。
+# Runtime dependencies for ComfyUI-FlashAttention4.
 #
-# FA4 kernel 由 `kernels` 在首次使用时下载（`SecondNatureComputing/flash-attn-4-sm120`），
-# 不走 requirements；CuTe DSL 运行栈（cuda-python / nvidia-cutlass-dsl / quack-kernels /
-# apache-tvm-ffi）见 pyproject.toml 的 `dependencies`。
+# Manager / `comfy node install` read this file and pip-install it into the
+# interpreter that runs ComfyUI. The CuTe DSL stack is Windows/Linux only, so
+# those entries carry a platform marker — on macOS the node still imports and
+# falls back to SDPA.
 #
-# 保留这个文件是为了 ComfyUI-Manager：它读到空依赖清单会直接跳过 pip 步骤。
-
+# `torch` and `comfy*` are provided by the host and deliberately not listed.
+kernels>=0.9,<0.14
+cuda-python; sys_platform == "win32" or sys_platform == "linux"
+nvidia-cutlass-dsl[cu13]>=4.6.2; sys_platform == "win32" or sys_platform == "linux"
+quack-kernels; sys_platform == "win32" or sys_platform == "linux"
+apache-tvm-ffi>=0.1.11,<0.2; sys_platform == "win32" or sys_platform == "linux"
