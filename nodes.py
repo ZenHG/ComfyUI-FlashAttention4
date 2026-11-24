@@ -46,8 +46,9 @@ class FlashAttention4ModelPatch:
                     "MODEL",
                     {
                         "tooltip": (
-                            "接入要加速的模型：连接在 UNETLoader / 模型加载之后、"
-                            "采样器之前。FA4 kernel 在第一次 attention 调用时才加载。"
+                            "Model to accelerate: connect after the UNETLoader / model loader "
+                            "and before the sampler. The FA4 kernel loads lazily on the first "
+                            "attention call."
                         )
                     },
                 ),
