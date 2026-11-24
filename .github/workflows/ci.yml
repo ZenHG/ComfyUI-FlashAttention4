@@ -24,7 +24,8 @@ jobs:
       - name: Install lint + test deps
         run: |
           python -m pip install --upgrade pip
-          python -m pip install ruff pytest torch --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install ruff pytest
+          python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
       - name: ruff
         run: python -m ruff check .
       - name: zero-GPU gate
