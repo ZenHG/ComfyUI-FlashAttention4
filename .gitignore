@@ -1,7 +1,30 @@
 __pycache__/
 *.py[cod]
+*.so
 .pytest_cache/
 .ruff_cache/
 dist/
 build/
-*.egg-info/
+.venv/
+venv/
+*.log
+
+# 本机宿主路径（开发机专用，不进库）
+.comfyui_path
+
+# 发布凭据（只放本地，绝不入库）
+.comfy_registry_token
+
+# 临时产物 / dump
+*_tmp.*
+*.tmp
+*.dump
+oi_*.json
+object_info*.json
+
+# 本机留档 / 审计
+LOCAL-*.md
+审计报告/
+out/
+.DS_Store
+Thumbs.db

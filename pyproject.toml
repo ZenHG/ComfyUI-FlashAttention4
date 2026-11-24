@@ -39,6 +39,8 @@ Issues = "https://github.com/ZenHG/ComfyUI-FlashAttention4/issues"
 requires-comfyui = ">=0.38.0"
 PublisherId = "zenhg"
 DisplayName = "FlashAttention4"
+Icon = "https://raw.githubusercontent.com/ZenHG/ComfyUI-FlashAttention4/main/icon.png"
+Banner = "https://raw.githubusercontent.com/ZenHG/ComfyUI-FlashAttention4/main/banner.png"
 
 [tool.ruff]
 line-length = 120

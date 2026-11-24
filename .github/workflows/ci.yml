@@ -1,0 +1,31 @@
+# 零 GPU 回归套件。CPU-only，不装 torch / 不碰 GPU。
+#
+# 设计口径：每个脚本用自己的退出码表达成败；失败即非零，CI 直接红。
+# 只跑"能确定判定"的东西：语法 / 适配器契约 / 节点契约 / 元数据 / ruff。
+# 成片质量不进 CI（要 GPU + 权重）。
+name: ci
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  zero-gpu:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install lint + test deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ruff pytest torch --index-url https://download.pytorch.org/whl/cpu
+      - name: ruff
+        run: python -m ruff check .
+      - name: zero-GPU gate
+        run: python tools/check_zero_gpu.py

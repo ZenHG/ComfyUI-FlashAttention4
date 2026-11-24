@@ -1,0 +1,8 @@
+# 本包**零 pip 依赖**：`torch` 与 `comfy*` 全部由宿主 ComfyUI 提供。
+#
+# FA4 kernel 由 `kernels` 在首次使用时下载（`SecondNatureComputing/flash-attn-4-sm120`），
+# 不走 requirements；CuTe DSL 运行栈（cuda-python / nvidia-cutlass-dsl / quack-kernels /
+# apache-tvm-ffi）见 pyproject.toml 的 `dependencies`。
+#
+# 保留这个文件是为了 ComfyUI-Manager：它读到空依赖清单会直接跳过 pip 步骤。
+

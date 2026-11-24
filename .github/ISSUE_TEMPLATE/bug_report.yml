@@ -1,0 +1,36 @@
+name: Bug report
+description: 节点报错 / 没加载 / 回退到 SDPA
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        报之前请先跑这两条，把结果贴上来：
+        ```
+        python tools/check_zero_gpu.py
+        ```
+        再贴宿主启动日志里 `[FlashAttention4]` 开头的行。
+  - type: input
+    id: versions
+    attributes:
+      label: 版本
+      description: ComfyUI 版本 + 本包版本 + torch / CUDA
+      placeholder: "ComfyUI 0.46.0 / FA4 0.2.2 / torch 2.13.0+cu130"
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: 出问题的部分
+      options:
+        - 安装 / 加载（节点不出现）
+        - 首次调用报错 / JIT 失败
+        - 回退到 SDPA（`sdpa_*` 计数非零）
+        - 画面质量
+        - 其他
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志
+      description: 贴 `[FlashAttention4]` / `FlashAttention 4 failed` / traceback
+      render: shell
