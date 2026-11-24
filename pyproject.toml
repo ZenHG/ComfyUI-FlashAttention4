@@ -1,0 +1,50 @@
+# Metadata only: ComfyUI-Manager / Comfy Registry read this file. This is a
+# ComfyUI custom node, not a pip-installable library, so there is deliberately
+# no [build-system] section.
+#
+# Keep keywords / classifiers / dependencies inside [project] and before
+# [project.urls]; TOML assigns trailing tables to the last header, so putting
+# them after urls would silently make them part of the urls table.
+[project]
+name = "comfyui-flash-attention4"
+version = "0.2.0"
+description = "ComfyUI MODEL patch that routes dense attention through FlashAttention 4 (CuTe DSL), using Dao-AILab FA4 or the SecondNatureComputing SM120/SM121 kernel bundle via kernels."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "ComfyUI-FlashAttention4 contributors" }]
+keywords = ["comfyui", "flash-attention", "flash-attention-4", "fa4", "attention", "model-patch", "sm120", "blackwell", "rtx-50", "minimax-h3"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Multimedia :: Video",
+    "Environment :: GPU :: NVIDIA CUDA",
+]
+# `kernels` downloads the SM120 bundle; the CuTe DSL code itself imports the
+# four packages below. Upstream FA4 users need the same CuTe DSL stack.
+dependencies = [
+    "kernels>=0.9,<0.14",
+    "cuda-python",
+    "nvidia-cutlass-dsl[cu13]>=4.4.1",
+    "quack-kernels",
+    "apache-tvm-ffi>=0.1.6,<0.2",
+]
+
+[project.urls]
+Repository = "https://github.com/ZenHG/ComfyUI-FlashAttention4"
+Homepage = "https://github.com/ZenHG/ComfyUI-FlashAttention4"
+Issues = "https://github.com/ZenHG/ComfyUI-FlashAttention4/issues"
+
+[tool.comfy]
+requires-comfyui = ">=0.38.0"
+PublisherId = "zenhg"
+DisplayName = "FlashAttention4"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+exclude = ["__pycache__", ".git", "dist"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "C4", "PIE", "RET", "RUF100"]
+ignore = ["E501"]

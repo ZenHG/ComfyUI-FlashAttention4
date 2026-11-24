@@ -1,0 +1,10 @@
+# `comfy node publish` packaging blacklist.
+# Git-tracked files are packaged by default; this excludes development-only
+# infrastructure from the published node.
+/tests/
+/tools/
+/.github/
+/AGENTS.md
+/.gitignore
+/.gitattributes
+/.comfyignore
