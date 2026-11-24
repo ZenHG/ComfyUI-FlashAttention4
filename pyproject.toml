@@ -6,7 +6,7 @@
 # [project.urls]; TOML assigns trailing tables to the last header, so putting
 # them after urls would silently make them part of the urls table.
 [project]
-name = "comfyui-flash-attention4"
+name = "comfyui-fa4"
 version = "0.2.2"
 description = "ComfyUI MODEL patch that routes dense attention through FlashAttention 4 (CuTe DSL) on NVIDIA SM80+ (Ampere/Ada/Hopper/Blackwell), using Dao-AILab FA4 or the SecondNatureComputing kernel bundle via kernels."
 readme = "README.md"
