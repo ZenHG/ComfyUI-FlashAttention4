@@ -1,6 +1,6 @@
 # ComfyUI-FlashAttention4
 
-🌐 **English** (this README is the canonical version)
+🌐 **English** · [中文](README_ZH.md)
 
 ![FlashAttention4 Model Patch](banner.png)
 
