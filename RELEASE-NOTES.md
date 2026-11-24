@@ -8,37 +8,85 @@
 > - 每节**必须中英双语**：中文在前，一行 `<!-- EN -->` 分隔，英文在后。
 > - 只写**用户能感知的变化**。有行为变化必须用 🔴 点明「要不要动配置」。
 > - 每节结尾固定两行：中文 `**升级动作**：…` / 英文 `**Action required**: …`。
+>
+> 长度：中文段 ≤700 字符，英文段 ≤1700 字符。
+
+---
+
+## 0.2.3 — 2026-11-24
+
+**Registry 包名定为 `comfyui-fa4`；FA4 的支持范围写全为 SM80 及以上。**
+
+- 包名从 `comfyui-flash-attention4` 改为 `comfyui-fa4`（前者在 registry 上已被别的包占用，无法使用）。
+- FA4 支持范围按上游源码写全：**SM80 / SM89 / SM90 / SM100 / SM110 / SM120**（Ampere、Ada、Hopper、Blackwell）。
+  本机只实测过 SM120（RTX 5070）；其它架构标为「预期可用、未实测」。
+- 节点名、节点分类、参数都没变；已装的用户升级不需要改工作流。
+- ⚠ 本节点**不做**显卡架构检查：调用 `flash_attn_func`，由 kernel bundle 自己分派；
+  没有对应 kernel 时报错并回退 SDPA（计入 `kernel_errors`）。
+
+**升级动作**：已装的用户直接覆盖 `custom_nodes/comfyui-fa4`；从 Manager 安装的走 Manager 更新。
+
+<!-- EN -->
+
+**Registry package name is now `comfyui-fa4`; FA4 support is stated as SM80 and newer.**
+
+- Package name changed from `comfyui-flash-attention4` to `comfyui-fa4` (the former is already taken on the registry by another pack).
+- FA4 support now matches upstream source: **SM80 / SM89 / SM90 / SM100 / SM110 / SM120** (Ampere, Ada, Hopper, Blackwell).
+  Only SM120 (RTX 5070) was tested here; other architectures are marked "expected to work, not tested".
+- Node names, category and parameters are unchanged; existing workflows keep working.
+- ⚠ This node does **not** check the GPU architecture itself: it calls `flash_attn_func` and lets the kernel bundle dispatch. With no matching kernel it raises and falls back to SDPA (counted in `kernel_errors`).
+
+**Action required**: Overwrite `custom_nodes/comfyui-fa4` if you installed manually, or update through the Manager.
 
 ---
 
 ## 0.2.2 — 2026-11-24
-- ✨ 新增 `FlashAttention4 Stats Line`：把 7 个计数器格式化成一行字符串，并标 `FA4 ACTIVE` / `NOT A CLEAN FA4 RUN`。
-- 🧰 `tests/test_node_contract.py` 增加 Stats Line 用例（3 节点注册 + 行格式 + 脏跑标记）。
+
+**新增 `FlashAttention4 Stats Line`：把 7 个计数器变成一行可读文本。**
+
+- 新增节点 `FlashAttention4 Stats Line`（7 个 INT 输入 → 1 个 STRING 输出）。
+- 输出形如：`fa4=15 sdpa_mask=0 sdpa_dtype=0 sdpa_gqa=0 sdpa_headdim=0 sdpa_meta=0 kernel_errors=0  => FA4 ACTIVE`。
+- 只要有任何一项回退，结尾会标 `NOT A CLEAN FA4 RUN`。
+- 解决了「`FlashAttention4 Stats` 的 7 个 INT 输出在前端只能看到第一个」的问题。
+
+**升级动作**：无。新装或覆盖即可；旧工作流不受影响。
+
+<!-- EN -->
+
+**New `FlashAttention4 Stats Line` node: the seven counters as one readable string.**
+
+- New node `FlashAttention4 Stats Line` (7 INT inputs → 1 STRING output).
+- Output looks like: `fa4=15 sdpa_mask=0 ... kernel_errors=0  => FA4 ACTIVE`.
+- Any fallback marks the line `NOT A CLEAN FA4 RUN`.
+- Fixes the UI limitation where only the first of the seven `FlashAttention4 Stats` outputs was visible.
+
+**Action required**: None. Install or overwrite; existing workflows are unaffected.
+
+---
 
 ## 0.2.1 — 2026-11-24
 
-**首个公开版本。FA4 的 ComfyUI MODEL patch，零elnstall 依赖，只包壳不重编 kernel。**
+**首个公开版本。FA4 的 ComfyUI MODEL patch，零 pip 依赖，只包壳不重编 kernel。**
 
 - 新增 `FlashAttention4 Model Patch`（MODEL → MODEL）：把 dense attention 路由到
-  FlashAttention 4（CuTe DSL），SM120/SM121 的 kernel 由 `kernels` 在首次调用时下载。
-- 新增 `FlashAttention4 Stats`：7 个 INT 输出，A/B 时能直接读「FA4 真的跑了几次、
-  有多少次回退到 SDPA」。每 30 秒还会往宿主 stdout 打一行 `live stats`，不用等收尾。
-- 🔴 需要宿主 Python 能 import `kernels`、`cuda-python`、`nvidia-cutlass-dsl[cu13]`、
-  `quack-kernels`、`apache-tvm-ffi`；装到错误的 Python 环境里节点不会生效。
-- ⚠ FA4 是 dense kernel：在量化 / 稀疏后端更快的负载上，FA4 可能更慢。
-  先量再换。
-- ⚠ 如果链上有 Spark-H3 这类稀疏节点，FA4 **收不到** dense 调用（Spark 自己路由
-  到 Kitchen）。要让 FA4 生效，需显式设 Spark 的 `dense_backend`；`inherit` 不等于 FA4。
+  FlashAttention 4（CuTe DSL），kernel 由 `kernels` 首次调用时下载。
+- 新增 `FlashAttention4 Stats`：7 个 INT 输出，读「FA4 跑了几次、回退几次」。
+  每 30 秒打一行 `live stats` 到宿主 stdout。
+- 🔴 宿主 Python 必须能 import `kernels`、`cuda-python`、`nvidia-cutlass-dsl[cu13]`、
+  `quack-kernels`、`apache-tvm-ffi`；装错环境节点不生效。
+- ⚠ FA4 是 dense kernel：量化 / 稀疏后端更快的负载上可能更慢，先量再换。
+- ⚠ 链上有 Spark-H3 时 FA4 **收不到** dense 调用；需显式设 Spark 的
+  `dense_backend`，`inherit` 不等于 FA4。
 
-**升级动作**：新装。把仓库 clone 到 `ComfyUI/custom_nodes/ComfyUI-FlashAttention4`，
-按 README 装运行依赖，重启 ComfyUI。
+**升级动作**：新装。clone 到 `ComfyUI/custom_nodes/ComfyUI-FlashAttention4`，
+按 README 装依赖，重启 ComfyUI。
 
 <!-- EN -->
 
 **First public release. A ComfyUI MODEL patch for FA4. No pip dependencies, wrapper only, no kernel rebuild.**
 
 - New `FlashAttention4 Model Patch` (MODEL → MODEL): routes dense attention through
-  FlashAttention 4 (CuTe DSL). The SM120/SM121 kernel is downloaded by `kernels` on first call.
+  FlashAttention 4 (CuTe DSL). The kernel is downloaded by `kernels` on first call.
 - New `FlashAttention4 Stats`: 7 INT outputs so an A/B run can read how many attention calls
   went through FA4 and how many fell back to SDPA. It also prints a `live stats` line to
   the host stdout every 30 s, so you do not have to wait for the run to finish.
@@ -51,4 +99,5 @@
   calls — Spark routes them to Kitchen itself. Set Spark's `dense_backend` explicitly;
   `inherit` does not mean FA4.
 
-**升级动作**：无。新装即可；已装的用户直接覆盖，不需要改配置。
+**Action required**: New install. Clone into `ComfyUI/custom_nodes/ComfyUI-FlashAttention4`,
+install the runtime deps from the README, restart ComfyUI.

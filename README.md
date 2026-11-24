@@ -8,8 +8,9 @@ source is rebuilt here.
 - Node: `FlashAttention4 Model Patch` (`FlashAttention4ModelPatch`, MODEL → MODEL)
 - Stats: `FlashAttention4 Stats` (`FlashAttention4Stats`, 7 INT outputs)
 - Stats line: `FlashAttention4 Stats Line` (`FlashAttention4StatsLine`, STRING, marks clean runs)
-- Registry name: `flash4`
-- Version: **0.2.2**
+- Attention registry name: `flash4`
+- Registry package name: `comfyui-fa4`
+- Version: **0.2.3**
 
 ## Install
 
@@ -44,7 +45,7 @@ FA4 is optional: on any unsupported input it falls back to SDPA. Add
 `FlashAttention4 Stats` with `reset=True` before the run, then read the
 outputs. A valid FA4 run has:
 
-- `fa4_calls > 0`
+- `fa4 > 0` (the `fa4` counter)
 - all `sdpa_mask` / `sdpa_dtype` / `sdpa_gqa` / `sdpa_headdim` / `sdpa_meta` = 0
 - `kernel_errors` = 0
 

@@ -2,6 +2,13 @@
 
 > 开发者向的历史记录。用户可见的升级说明写在 [`RELEASE-NOTES.md`](RELEASE-NOTES.md)。
 
+## 0.2.3 — 2026-11-24
+- 📦 registry 包名定为 `comfyui-fa4`（`comfyui-flash-attention4` 已被占）。
+- 📐 平台声明按 bundle 源码写全：SM80/89/90/100/110/120（本机只实测 SM120）。
+- 🧰 README 的 STATS 字段名修正为 `fa4`（此前误写 `fa4_calls`，实际计数器叫 `fa4`）。
+- 🧰 README 区分「attention registry name (`flash4`)」与「registry package name (`comfyui-fa4`)」。
+- 🧰 `RELEASE-NOTES.md` 0.2.1/0.2.2 补中英成对（此前只有中文）。
+
 ## 0.2.2 — 2026-11-24
 - ✨ 新增 `FlashAttention4 Stats Line`：把 7 个计数器格式化成一行字符串，并标 `FA4 ACTIVE` / `NOT A CLEAN FA4 RUN`。
 - 🧰 `tests/test_node_contract.py` 增加 Stats Line 用例（3 节点注册 + 行格式 + 脏跑标记）。

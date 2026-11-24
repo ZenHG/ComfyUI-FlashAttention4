@@ -4,7 +4,7 @@
 Zero GPU. Complements tools_local_ab_quality.py with metrics that are less
 sensitive to overall motion magnitude.
 
-Run: I:\\python\\python.exe tools_local_ab_quality2.py
+Run: COMFYUI_OUTPUT=/path/to/ComfyUI/output python tools/ab_quality2.py
 """
 from __future__ import annotations
 
@@ -15,7 +15,9 @@ import sys
 import cv2
 import numpy as np
 
-OUT = os.environ.get("COMFYUI_OUTPUT", r"I:\ComfyUI\output")
+OUT = os.environ.get("COMFYUI_OUTPUT")
+if not OUT:
+    raise SystemExit("set COMFYUI_OUTPUT=/path/to/ComfyUI/output")
 JSON_OUT = os.environ.get("AB_JSON_OUT", os.path.join(OUT, "ab_quality2.json"))
 
 VIDS = {

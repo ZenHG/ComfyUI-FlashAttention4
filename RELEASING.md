@@ -34,7 +34,6 @@
 ```bash
 # ① 预检
 python tools/check_zero_gpu.py
-python tools/check_release_ready.py
 
 # ② 提交 + 打 tag
 git add . && git commit -m "release: x.y.z"

@@ -10,11 +10,11 @@
 
 ## 环境变量
 
-`ab_quality*.py` 默认读 `I:\ComfyUI\output`（开发机路径，仅为默认值）：
+`ab_quality*.py` 默认读环境变量 `COMFYUI_OUTPUT`，未设置时报错退出（脚本里不写死任何机器路径）：
 
 | 变量 | 作用 | 默认 |
 |---|---|---|
-| `COMFYUI_OUTPUT` | 视频目录 | `I:\ComfyUI\output` |
+| `COMFYUI_OUTPUT` | 视频目录 | 无默认，必须设置 |
 | `AB_JSON_OUT` | 指标 JSON 输出路径 | `<OUT>/ab_quality.json` |
 | `AB_SHEET` | contact sheet 输出路径 | `<OUT>/ab_contact_sheet.png` |
 
@@ -23,7 +23,7 @@
 ```bash
 COMFYUI_OUTPUT=/path/to/ComfyUI/output \
 AB_SHEET=/tmp/ab_sheet.png \
-I:\python\python.exe tools/ab_quality.py
+python tools/ab_quality.py
 ```
 
 ## 视频清单

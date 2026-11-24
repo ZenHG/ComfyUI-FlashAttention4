@@ -4,7 +4,7 @@
 Zero GPU. Reads the mp4s produced by the T3 matrix and prints a table plus a
 contact sheet PNG for human review.
 
-Run: I:\\python\\python.exe tools_local_ab_quality.py
+Run: COMFYUI_OUTPUT=/path/to/ComfyUI/output python tools/ab_quality.py
 """
 from __future__ import annotations
 
@@ -15,7 +15,9 @@ import sys
 import cv2
 import numpy as np
 
-OUT = os.environ.get("COMFYUI_OUTPUT", r"I:\ComfyUI\output")
+OUT = os.environ.get("COMFYUI_OUTPUT")
+if not OUT:
+    raise SystemExit("set COMFYUI_OUTPUT=/path/to/ComfyUI/output")
 SHEET = os.environ.get("AB_SHEET", os.path.join(OUT, "ab_contact_sheet.png"))
 JSON_OUT = os.environ.get("AB_JSON_OUT", os.path.join(OUT, "ab_quality.json"))
 
