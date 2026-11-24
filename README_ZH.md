@@ -108,6 +108,9 @@ FA4 在不支持的输入上会回退 SDPA，所以「没报错」不等于「FA
 
 ## 2 · 什么情况下回退到 SDPA
 
+「SDPA」= PyTorch 自带的 `scaled_dot_product_attention`（通用保底实现）。
+任何不支持的情况都落到它：画面不会崩，但也没有 FA4 的加速。
+
 | 条件 | 原因 |
 |---|---|
 | `mask` 不是 None | FA4 没有 attention-mask 路径 |
@@ -143,8 +146,11 @@ FA4 在不支持的输入上会回退 SDPA，所以「没报错」不等于「FA
 | 日志 | 含义 | 怎么办 |
 |---|---|---|
 | `No module named 'flash_attn'` + bundle 下载失败 | `kernels` 拉不到 bundle | 查网络 / HF 访问，重试 |
-| `CUDA error` / `no kernel image is available` | 这个架构没有 kernel | 看 [§4](#4-支持的平台) |
+| `CUDA error` / `no kernel image is available` | 这个显卡架构没有对应 kernel | 看 [§4](#4-支持的平台) |
 | `head_dim` / `shape` 报错 | 不支持的张量形状 | 适配器本该拦住；请开 issue |
+
+> 说明：这里的 “SDPA” 指 PyTorch 自带的通用注意力实现（`scaled_dot_product_attention`）。
+> 它是**保底路径**——任何不支持的情况都退回它，画面不会崩，但也没有 FA4 的加速。
 
 ### 3.4 第一次调用要 30 秒（或几分钟）
 
@@ -187,7 +193,13 @@ FA4（CuTe DSL）支持 **SM80 / SM89 / SM90 / SM100 / SM110 / SM120**——上�
 
 ## 5 · 基准
 
-负载：640×832、124 帧、6 步、`er_sde`、LoRA×2、RTX 5070、
+**测试底模**：MiniMax-H3（13.7–13.9B 级），底模文件
+`Cobijada_H3_Hybrid_Uncensored_pruned_hybrid_int8_convrot_pruned.safetensors`
+（INT8 convrot，21 GB）+ 两个 LoRA（`H3-Licon-VBVR-I2V-V2`、
+`pika_h3_flex_ref2va_v1_avg_rank_55_bf16`），强度都是 1.0。
+**底模和 LoRA 都不随包分发，需自备。**
+
+**负载**：640×832、124 帧、6 步、`er_sde`、RTX 5070、
 ComfyUI `Prompt executed` 秒数。cold = 重启后第一次。
 
 | 后端 | Cold | Hot | 备注 |
@@ -199,7 +211,7 @@ ComfyUI `Prompt executed` 秒数。cold = 重启后第一次。
 
 ### 步数比后端更值钱
 
-同一张图（Kitchen、LoRA×2、无 Spark），只改 sigma 表：
+同一张图、同一底模（Kitchen、LoRA×2、无 Spark），只改 sigma 表：
 
 | 步数 | 耗时 |
 |---:|---:|

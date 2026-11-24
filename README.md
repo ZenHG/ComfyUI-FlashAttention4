@@ -113,6 +113,9 @@ needs them, restart ComfyUI. Nothing else in the repo is required by the host.
 
 ## 2 · What falls back to SDPA
 
+"SDPA" = PyTorch's built-in `scaled_dot_product_attention` — the safe generic path.
+Anything unsupported lands there; the image survives, but you get no FA4 speedup.
+
 | Condition | Why |
 |---|---|
 | `mask` is not None | FA4 has no attention-mask path |
@@ -151,8 +154,12 @@ exact interpreter. Check with:
 | Log line | Meaning | Fix |
 |---|---|---|
 | `No module named 'flash_attn'` + bundle download fails | `kernels` could not fetch the bundle | check network / HF access, then retry |
-| `CUDA error` / `no kernel image is available` | no kernel for this arch | see [§4](#4-supported-platforms) |
+| `CUDA error` / `no kernel image is available` | no kernel for this GPU architecture | see [§4](#4-supported-platforms) |
 | `head_dim` / `shape` errors | unsupported tensor shape | the adapter should have caught it; report it |
+
+> Note: "SDPA" here means PyTorch's built-in `scaled_dot_product_attention`.
+> It is the **fallback path** — anything unsupported lands there. The image will not
+> break, but you get no FA4 speedup.
 
 ### 3.4 First call takes ~30 s (or several minutes)
 
@@ -196,7 +203,12 @@ No matching kernel ⇒ the call raises ⇒ SDPA fallback (counted in `kernel_err
 
 ## 5 · Benchmarks
 
-Workload: 640×832, 124 frames, 6 steps, `er_sde`, LoRA×2, RTX 5070, ComfyUI
+**Test model:** MiniMax-H3 (13.7–13.9 B class), base checkpoint
+`Cobijada_H3_Hybrid_Uncensored_pruned_hybrid_int8_convrot_pruned.safetensors`
+(INT8 convrot, 21 GB) + two LoRAs (`H3-Licon-VBVR-I2V-V2`, `pika_h3_flex_ref2va_v1_avg_rank_55_bf16`),
+both at strength 1.0. Neither the checkpoint nor the LoRAs are bundled — you supply your own.
+
+**Workload:** 640×832, 124 frames, 6 steps, `er_sde`, RTX 5070, ComfyUI
 `Prompt executed` seconds. Cold = first run after a restart.
 
 | Backend | Cold | Hot | Note |
@@ -208,7 +220,7 @@ Workload: 640×832, 124 frames, 6 steps, `er_sde`, LoRA×2, RTX 5070, ComfyUI
 
 ### Step count matters more than the backend
 
-Same graph (Kitchen, LoRA×2, no Spark), only the sigma table changed:
+Same graph and same base model as above (Kitchen, LoRA×2, no Spark), only the sigma table changed:
 
 | Steps | Time |
 |---:|---:|
