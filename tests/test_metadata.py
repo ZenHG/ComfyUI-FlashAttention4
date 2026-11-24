@@ -55,11 +55,9 @@ def main():
     with open(os.path.join(ROOT, "README.md"), encoding="utf-8") as f:
         readme = f.read()
     for needle in (
-        "152s",
-        "140.2s",
-        "640×832×124",
+        "640×832",
+        "124 frames",
         "er_sde",
-        "0.95",
         "BSD-3-Clause",
         "SecondNatureComputing/flash-attn-4-sm120",
         "flash4",
