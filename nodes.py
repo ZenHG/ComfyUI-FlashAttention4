@@ -111,16 +111,18 @@ class FlashAttention4Stats:
         s = attention_fa4.stats_snapshot()
         if reset:
             # The reset node executes BEFORE the sampler, so printing immediately
-            # always shows zeros. Spawn a daemon that prints the live snapshot
-            # after the sampler has had time to run.
+            # always shows zeros. Poll in a daemon thread and print as soon as a
+            # counter moves, or at the deadline for an all-zero (FA4 unused) run.
             import threading
 
             def _deferred_snapshot():
                 import time as _time
-                _time.sleep(30)
-                s2 = attention_fa4.stats_snapshot()
-                log.info("[FlashAttention4] deferred stats %s", s2)
-                print("[FlashAttention4] deferred stats %s" % s2, flush=True)
+                deadline = _time.time() + 900
+                while _time.time() < deadline:
+                    s2 = attention_fa4.stats_snapshot()
+                    log.info("[FlashAttention4] live stats %s", s2)
+                    print("[FlashAttention4] live stats %s" % s2, flush=True)
+                    _time.sleep(30)
 
             threading.Thread(target=_deferred_snapshot, daemon=True).start()
         log.info("[FlashAttention4] stats %s", s)
