@@ -54,7 +54,7 @@ python tools/check_zero_gpu.py
 
 ## 开源卫生（三条硬要求）
 
-1. **不写本机路径**：盘符路径（`H:\` / `I:\` / `C:\Users\...`）一律不进仓库；示例用 `<ComfyUI>` / `/path/to/...`。
+1. **不写本机路径**：任何盘符绝对路径（`<盘符>:\...`、用户家目录）一律不进仓库；示例用 `<ComfyUI>` / `/path/to/...`。
 2. **不写凭据**：registry PAT 只放 `<仓根>/.comfy_registry_token`（已 gitignore）。
 3. **不留未跟踪文件**：`git status --short` 必须干净（`LOCAL-*.md`、`审计报告/` 已被 `.gitignore` 挡住）。
 
